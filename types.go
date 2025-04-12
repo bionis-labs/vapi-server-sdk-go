@@ -23329,6 +23329,7 @@ func (d DeepgramTranscriberLanguage) Ptr() *DeepgramTranscriberLanguage {
 type DeepgramTranscriberModel string
 
 const (
+	DeepgramTranscriberModelNova3                 DeepgramTranscriberModel = "nova-3"
 	DeepgramTranscriberModelNova2                 DeepgramTranscriberModel = "nova-2"
 	DeepgramTranscriberModelNova2General          DeepgramTranscriberModel = "nova-2-general"
 	DeepgramTranscriberModelNova2Meeting          DeepgramTranscriberModel = "nova-2-meeting"
@@ -23361,6 +23362,8 @@ const (
 
 func NewDeepgramTranscriberModelFromString(s string) (DeepgramTranscriberModel, error) {
 	switch s {
+	case "nova-3":
+		return DeepgramTranscriberModelNova3, nil
 	case "nova-2":
 		return DeepgramTranscriberModelNova2, nil
 	case "nova-2-general":
