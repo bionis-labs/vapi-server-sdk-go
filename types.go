@@ -5,8 +5,9 @@ package api
 import (
 	json "encoding/json"
 	fmt "fmt"
-	internal "github.com/VapiAI/server-sdk-go/internal"
 	time "time"
+
+	internal "github.com/VapiAI/server-sdk-go/internal"
 )
 
 type AddVoiceToProviderDto struct {
@@ -20708,6 +20709,7 @@ func (c *CreateWorkflowDto) String() string {
 }
 
 type CreateWorkflowDtoNodesItem struct {
+	Start      *Start
 	Say        *Say
 	Gather     *Gather
 	ApiRequest *ApiRequest
@@ -38628,6 +38630,86 @@ func (s *S3Credential) MarshalJSON() ([]byte, error) {
 }
 
 func (s *S3Credential) String() string {
+	if len(s.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(s); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", s)
+}
+
+type Start struct {
+	Name     string                 `json:"name" url:"name"`
+	Metadata map[string]interface{} `json:"metadata,omitempty" url:"metadata,omitempty"`
+	type_    string
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (s *Start) GetName() string {
+	if s == nil {
+		return ""
+	}
+	return s.Name
+}
+
+func (s *Start) GetMetadata() map[string]interface{} {
+	if s == nil {
+		return nil
+	}
+	return s.Metadata
+}
+
+func (s *Start) Type() string {
+	return s.type_
+}
+
+func (s *Start) GetExtraProperties() map[string]interface{} {
+	return s.extraProperties
+}
+
+func (s *Start) UnmarshalJSON(data []byte) error {
+	type embed Start
+	var unmarshaler = struct {
+		embed
+		Type string `json:"type"`
+	}{
+		embed: embed(*s),
+	}
+	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+		return err
+	}
+	*s = Start(unmarshaler.embed)
+	if unmarshaler.Type != "start" {
+		return fmt.Errorf("unexpected value for literal on type %T; expected %v got %v", s, "start", unmarshaler.Type)
+	}
+	s.type_ = unmarshaler.Type
+	extraProperties, err := internal.ExtractExtraProperties(data, *s, "type")
+	if err != nil {
+		return err
+	}
+	s.extraProperties = extraProperties
+	s.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (s *Start) MarshalJSON() ([]byte, error) {
+	type embed Start
+	var marshaler = struct {
+		embed
+		Type string `json:"type"`
+	}{
+		embed: embed(*s),
+		Type:  "start",
+	}
+	return json.Marshal(marshaler)
+}
+
+func (s *Start) String() string {
 	if len(s.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(s.rawJSON); err == nil {
 			return value
