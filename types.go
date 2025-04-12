@@ -76,18 +76,18 @@ func (a *AddVoiceToProviderDto) String() string {
 }
 
 type AiEdgeCondition struct {
-	Matches []string `json:"matches,omitempty" url:"matches,omitempty"`
-	type_   string
+	Prompt *string `json:"prompt,omitempty" url:"prompt,omitempty"`
+	type_  string
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
 }
 
-func (a *AiEdgeCondition) GetMatches() []string {
+func (a *AiEdgeCondition) GetPrompt() *string {
 	if a == nil {
 		return nil
 	}
-	return a.Matches
+	return a.Prompt
 }
 
 func (a *AiEdgeCondition) Type() string {
