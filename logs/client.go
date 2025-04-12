@@ -5,10 +5,10 @@ package logs
 import (
 	context "context"
 	fmt "fmt"
-	serversdkgo "github.com/VapiAI/server-sdk-go"
-	core "github.com/VapiAI/server-sdk-go/core"
-	internal "github.com/VapiAI/server-sdk-go/internal"
-	option "github.com/VapiAI/server-sdk-go/option"
+	serversdkgo "github.com/bionis-labs/vapi-server-sdk-go"
+	core "github.com/bionis-labs/vapi-server-sdk-go/core"
+	internal "github.com/bionis-labs/vapi-server-sdk-go/internal"
+	option "github.com/bionis-labs/vapi-server-sdk-go/option"
 	http "net/http"
 )
 

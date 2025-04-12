@@ -3,7 +3,7 @@ package internal
 import (
 	"context"
 
-	"github.com/VapiAI/server-sdk-go/core"
+	"github.com/bionis-labs/vapi-server-sdk-go/core"
 )
 
 // PagerMode represents the different types of pagination modes.
