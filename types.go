@@ -60080,6 +60080,7 @@ func (w *Workflow) String() string {
 }
 
 type WorkflowNodesItem struct {
+	Start      *Start
 	Say        *Say
 	Gather     *Gather
 	ApiRequest *ApiRequest
@@ -60087,6 +60088,13 @@ type WorkflowNodesItem struct {
 	Transfer   *Transfer
 
 	typ string
+}
+
+func (w *WorkflowNodesItem) GetStart() *Start {
+	if w == nil {
+		return nil
+	}
+	return w.Start
 }
 
 func (w *WorkflowNodesItem) GetSay() *Say {
@@ -60125,6 +60133,12 @@ func (w *WorkflowNodesItem) GetTransfer() *Transfer {
 }
 
 func (w *WorkflowNodesItem) UnmarshalJSON(data []byte) error {
+	valueStart := new(Start)
+	if err := json.Unmarshal(data, &valueStart); err == nil {
+		w.typ = "Start"
+		w.Start = valueStart
+		return nil
+	}
 	valueSay := new(Say)
 	if err := json.Unmarshal(data, &valueSay); err == nil {
 		w.typ = "Say"
@@ -60159,6 +60173,9 @@ func (w *WorkflowNodesItem) UnmarshalJSON(data []byte) error {
 }
 
 func (w WorkflowNodesItem) MarshalJSON() ([]byte, error) {
+	if w.typ == "Start" || w.Start != nil {
+		return json.Marshal(w.Start)
+	}
 	if w.typ == "Say" || w.Say != nil {
 		return json.Marshal(w.Say)
 	}
@@ -60178,6 +60195,7 @@ func (w WorkflowNodesItem) MarshalJSON() ([]byte, error) {
 }
 
 type WorkflowNodesItemVisitor interface {
+	VisitStart(*Start) error
 	VisitSay(*Say) error
 	VisitGather(*Gather) error
 	VisitApiRequest(*ApiRequest) error
@@ -60186,6 +60204,9 @@ type WorkflowNodesItemVisitor interface {
 }
 
 func (w *WorkflowNodesItem) Accept(visitor WorkflowNodesItemVisitor) error {
+	if w.typ == "Start" || w.Start != nil {
+		return visitor.VisitStart(w.Start)
+	}
 	if w.typ == "Say" || w.Say != nil {
 		return visitor.VisitSay(w.Say)
 	}
