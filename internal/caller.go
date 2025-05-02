@@ -12,7 +12,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/VapiAI/server-sdk-go/core"
+	"github.com/bionis-labs/vapi-server-sdk-go/core"
 )
 
 const (

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/VapiAI/server-sdk-go/core"
+	"github.com/bionis-labs/vapi-server-sdk-go/core"
 )
 
 // ErrorDecoder decodes *http.Response errors and returns a
