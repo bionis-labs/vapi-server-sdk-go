@@ -38,6 +38,8 @@ type ByoPhoneNumber struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *ByoPhoneNumberFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
 	// This is the flag to toggle the E164 check for the `number` field. This is an advanced property which should be used if you know your use case requires it.
 	//
 	// Use cases:
@@ -93,6 +95,13 @@ func (b *ByoPhoneNumber) GetFallbackDestination() *ByoPhoneNumberFallbackDestina
 		return nil
 	}
 	return b.FallbackDestination
+}
+
+func (b *ByoPhoneNumber) GetHooks() []*PhoneNumberHookCallRinging {
+	if b == nil {
+		return nil
+	}
+	return b.Hooks
 }
 
 func (b *ByoPhoneNumber) GetNumberE164CheckEnabled() *bool {
@@ -346,6 +355,8 @@ type CreateByoPhoneNumberDto struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *CreateByoPhoneNumberDtoFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
 	// This is the flag to toggle the E164 check for the `number` field. This is an advanced property which should be used if you know your use case requires it.
 	//
 	// Use cases:
@@ -391,6 +402,13 @@ func (c *CreateByoPhoneNumberDto) GetFallbackDestination() *CreateByoPhoneNumber
 		return nil
 	}
 	return c.FallbackDestination
+}
+
+func (c *CreateByoPhoneNumberDto) GetHooks() []*PhoneNumberHookCallRinging {
+	if c == nil {
+		return nil
+	}
+	return c.Hooks
 }
 
 func (c *CreateByoPhoneNumberDto) GetNumberE164CheckEnabled() *bool {
@@ -567,6 +585,225 @@ func (c *CreateByoPhoneNumberDtoFallbackDestination) Accept(visitor CreateByoPho
 	return fmt.Errorf("type %T does not include a non-empty union type", c)
 }
 
+type CreateTelnyxPhoneNumberDto struct {
+	// This is the fallback destination an inbound call will be transferred to if:
+	// 1. `assistantId` is not set
+	// 2. `squadId` is not set
+	// 3. and, `assistant-request` message to the `serverUrl` fails
+	//
+	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
+	FallbackDestination *CreateTelnyxPhoneNumberDtoFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
+	// These are the digits of the phone number you own on your Telnyx.
+	Number string `json:"number" url:"number"`
+	// This is the credential you added in dashboard.vapi.ai/keys. This is used to configure the number to send inbound calls to Vapi, make outbound calls and do live call updates like transfers and hangups.
+	CredentialId string `json:"credentialId" url:"credentialId"`
+	// This is the name of the phone number. This is just for your own reference.
+	Name *string `json:"name,omitempty" url:"name,omitempty"`
+	// This is the assistant that will be used for incoming calls to this phone number.
+	//
+	// If neither `assistantId` nor `squadId` is set, `assistant-request` will be sent to your Server URL. Check `ServerMessage` and `ServerMessageResponse` for the shape of the message and response that is expected.
+	AssistantId *string `json:"assistantId,omitempty" url:"assistantId,omitempty"`
+	// This is the squad that will be used for incoming calls to this phone number.
+	//
+	// If neither `assistantId` nor `squadId` is set, `assistant-request` will be sent to your Server URL. Check `ServerMessage` and `ServerMessageResponse` for the shape of the message and response that is expected.
+	SquadId *string `json:"squadId,omitempty" url:"squadId,omitempty"`
+	// This is where Vapi will send webhooks. You can find all webhooks available along with their shape in ServerMessage schema.
+	//
+	// The order of precedence is:
+	//
+	// 1. assistant.server
+	// 2. phoneNumber.server
+	// 3. org.server
+	Server   *Server `json:"server,omitempty" url:"server,omitempty"`
+	provider string
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (c *CreateTelnyxPhoneNumberDto) GetFallbackDestination() *CreateTelnyxPhoneNumberDtoFallbackDestination {
+	if c == nil {
+		return nil
+	}
+	return c.FallbackDestination
+}
+
+func (c *CreateTelnyxPhoneNumberDto) GetHooks() []*PhoneNumberHookCallRinging {
+	if c == nil {
+		return nil
+	}
+	return c.Hooks
+}
+
+func (c *CreateTelnyxPhoneNumberDto) GetNumber() string {
+	if c == nil {
+		return ""
+	}
+	return c.Number
+}
+
+func (c *CreateTelnyxPhoneNumberDto) GetCredentialId() string {
+	if c == nil {
+		return ""
+	}
+	return c.CredentialId
+}
+
+func (c *CreateTelnyxPhoneNumberDto) GetName() *string {
+	if c == nil {
+		return nil
+	}
+	return c.Name
+}
+
+func (c *CreateTelnyxPhoneNumberDto) GetAssistantId() *string {
+	if c == nil {
+		return nil
+	}
+	return c.AssistantId
+}
+
+func (c *CreateTelnyxPhoneNumberDto) GetSquadId() *string {
+	if c == nil {
+		return nil
+	}
+	return c.SquadId
+}
+
+func (c *CreateTelnyxPhoneNumberDto) GetServer() *Server {
+	if c == nil {
+		return nil
+	}
+	return c.Server
+}
+
+func (c *CreateTelnyxPhoneNumberDto) Provider() string {
+	return c.provider
+}
+
+func (c *CreateTelnyxPhoneNumberDto) GetExtraProperties() map[string]interface{} {
+	return c.extraProperties
+}
+
+func (c *CreateTelnyxPhoneNumberDto) UnmarshalJSON(data []byte) error {
+	type embed CreateTelnyxPhoneNumberDto
+	var unmarshaler = struct {
+		embed
+		Provider string `json:"provider"`
+	}{
+		embed: embed(*c),
+	}
+	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+		return err
+	}
+	*c = CreateTelnyxPhoneNumberDto(unmarshaler.embed)
+	if unmarshaler.Provider != "telnyx" {
+		return fmt.Errorf("unexpected value for literal on type %T; expected %v got %v", c, "telnyx", unmarshaler.Provider)
+	}
+	c.provider = unmarshaler.Provider
+	extraProperties, err := internal.ExtractExtraProperties(data, *c, "provider")
+	if err != nil {
+		return err
+	}
+	c.extraProperties = extraProperties
+	c.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *CreateTelnyxPhoneNumberDto) MarshalJSON() ([]byte, error) {
+	type embed CreateTelnyxPhoneNumberDto
+	var marshaler = struct {
+		embed
+		Provider string `json:"provider"`
+	}{
+		embed:    embed(*c),
+		Provider: "telnyx",
+	}
+	return json.Marshal(marshaler)
+}
+
+func (c *CreateTelnyxPhoneNumberDto) String() string {
+	if len(c.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(c.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
+}
+
+// This is the fallback destination an inbound call will be transferred to if:
+// 1. `assistantId` is not set
+// 2. `squadId` is not set
+// 3. and, `assistant-request` message to the `serverUrl` fails
+//
+// If this is not set and above conditions are met, the inbound call is hung up with an error message.
+type CreateTelnyxPhoneNumberDtoFallbackDestination struct {
+	TransferDestinationNumber *TransferDestinationNumber
+	TransferDestinationSip    *TransferDestinationSip
+
+	typ string
+}
+
+func (c *CreateTelnyxPhoneNumberDtoFallbackDestination) GetTransferDestinationNumber() *TransferDestinationNumber {
+	if c == nil {
+		return nil
+	}
+	return c.TransferDestinationNumber
+}
+
+func (c *CreateTelnyxPhoneNumberDtoFallbackDestination) GetTransferDestinationSip() *TransferDestinationSip {
+	if c == nil {
+		return nil
+	}
+	return c.TransferDestinationSip
+}
+
+func (c *CreateTelnyxPhoneNumberDtoFallbackDestination) UnmarshalJSON(data []byte) error {
+	valueTransferDestinationNumber := new(TransferDestinationNumber)
+	if err := json.Unmarshal(data, &valueTransferDestinationNumber); err == nil {
+		c.typ = "TransferDestinationNumber"
+		c.TransferDestinationNumber = valueTransferDestinationNumber
+		return nil
+	}
+	valueTransferDestinationSip := new(TransferDestinationSip)
+	if err := json.Unmarshal(data, &valueTransferDestinationSip); err == nil {
+		c.typ = "TransferDestinationSip"
+		c.TransferDestinationSip = valueTransferDestinationSip
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, c)
+}
+
+func (c CreateTelnyxPhoneNumberDtoFallbackDestination) MarshalJSON() ([]byte, error) {
+	if c.typ == "TransferDestinationNumber" || c.TransferDestinationNumber != nil {
+		return json.Marshal(c.TransferDestinationNumber)
+	}
+	if c.typ == "TransferDestinationSip" || c.TransferDestinationSip != nil {
+		return json.Marshal(c.TransferDestinationSip)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
+type CreateTelnyxPhoneNumberDtoFallbackDestinationVisitor interface {
+	VisitTransferDestinationNumber(*TransferDestinationNumber) error
+	VisitTransferDestinationSip(*TransferDestinationSip) error
+}
+
+func (c *CreateTelnyxPhoneNumberDtoFallbackDestination) Accept(visitor CreateTelnyxPhoneNumberDtoFallbackDestinationVisitor) error {
+	if c.typ == "TransferDestinationNumber" || c.TransferDestinationNumber != nil {
+		return visitor.VisitTransferDestinationNumber(c.TransferDestinationNumber)
+	}
+	if c.typ == "TransferDestinationSip" || c.TransferDestinationSip != nil {
+		return visitor.VisitTransferDestinationSip(c.TransferDestinationSip)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", c)
+}
+
 type CreateTwilioPhoneNumberDto struct {
 	// This is the fallback destination an inbound call will be transferred to if:
 	// 1. `assistantId` is not set
@@ -575,12 +812,25 @@ type CreateTwilioPhoneNumberDto struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *CreateTwilioPhoneNumberDtoFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
+	// Controls whether Vapi sets the messaging webhook URL on the Twilio number during import.
+	//
+	// If set to `false`, Vapi will not update the Twilio messaging URL, leaving it as is.
+	// If `true` or omitted (default), Vapi will configure both the voice and messaging URLs.
+	//
+	// @default true
+	SmsEnabled *bool `json:"smsEnabled,omitempty" url:"smsEnabled,omitempty"`
 	// These are the digits of the phone number you own on your Twilio.
 	Number string `json:"number" url:"number"`
 	// This is the Twilio Account SID for the phone number.
 	TwilioAccountSid string `json:"twilioAccountSid" url:"twilioAccountSid"`
 	// This is the Twilio Auth Token for the phone number.
-	TwilioAuthToken string `json:"twilioAuthToken" url:"twilioAuthToken"`
+	TwilioAuthToken *string `json:"twilioAuthToken,omitempty" url:"twilioAuthToken,omitempty"`
+	// This is the Twilio API Key for the phone number.
+	TwilioApiKey *string `json:"twilioApiKey,omitempty" url:"twilioApiKey,omitempty"`
+	// This is the Twilio API Secret for the phone number.
+	TwilioApiSecret *string `json:"twilioApiSecret,omitempty" url:"twilioApiSecret,omitempty"`
 	// This is the name of the phone number. This is just for your own reference.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
 	// This is the assistant that will be used for incoming calls to this phone number.
@@ -612,6 +862,20 @@ func (c *CreateTwilioPhoneNumberDto) GetFallbackDestination() *CreateTwilioPhone
 	return c.FallbackDestination
 }
 
+func (c *CreateTwilioPhoneNumberDto) GetHooks() []*PhoneNumberHookCallRinging {
+	if c == nil {
+		return nil
+	}
+	return c.Hooks
+}
+
+func (c *CreateTwilioPhoneNumberDto) GetSmsEnabled() *bool {
+	if c == nil {
+		return nil
+	}
+	return c.SmsEnabled
+}
+
 func (c *CreateTwilioPhoneNumberDto) GetNumber() string {
 	if c == nil {
 		return ""
@@ -626,11 +890,25 @@ func (c *CreateTwilioPhoneNumberDto) GetTwilioAccountSid() string {
 	return c.TwilioAccountSid
 }
 
-func (c *CreateTwilioPhoneNumberDto) GetTwilioAuthToken() string {
+func (c *CreateTwilioPhoneNumberDto) GetTwilioAuthToken() *string {
 	if c == nil {
-		return ""
+		return nil
 	}
 	return c.TwilioAuthToken
+}
+
+func (c *CreateTwilioPhoneNumberDto) GetTwilioApiKey() *string {
+	if c == nil {
+		return nil
+	}
+	return c.TwilioApiKey
+}
+
+func (c *CreateTwilioPhoneNumberDto) GetTwilioApiSecret() *string {
+	if c == nil {
+		return nil
+	}
+	return c.TwilioApiSecret
 }
 
 func (c *CreateTwilioPhoneNumberDto) GetName() *string {
@@ -794,6 +1072,8 @@ type CreateVapiPhoneNumberDto struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *CreateVapiPhoneNumberDtoFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
 	// This is the area code of the phone number to purchase.
 	NumberDesiredAreaCode *string `json:"numberDesiredAreaCode,omitempty" url:"numberDesiredAreaCode,omitempty"`
 	// This is the SIP URI of the phone number. You can SIP INVITE this. The assistant attached to this number will answer.
@@ -833,6 +1113,13 @@ func (c *CreateVapiPhoneNumberDto) GetFallbackDestination() *CreateVapiPhoneNumb
 		return nil
 	}
 	return c.FallbackDestination
+}
+
+func (c *CreateVapiPhoneNumberDto) GetHooks() []*PhoneNumberHookCallRinging {
+	if c == nil {
+		return nil
+	}
+	return c.Hooks
 }
 
 func (c *CreateVapiPhoneNumberDto) GetNumberDesiredAreaCode() *string {
@@ -1017,9 +1304,11 @@ type CreateVonagePhoneNumberDto struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *CreateVonagePhoneNumberDtoFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
 	// These are the digits of the phone number you own on your Vonage.
 	Number string `json:"number" url:"number"`
-	// This is the credential that is used to make outgoing calls, and do operations like call transfer and hang up.
+	// This is the credential you added in dashboard.vapi.ai/keys. This is used to configure the number to send inbound calls to Vapi, make outbound calls and do live call updates like transfers and hangups.
 	CredentialId string `json:"credentialId" url:"credentialId"`
 	// This is the name of the phone number. This is just for your own reference.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
@@ -1050,6 +1339,13 @@ func (c *CreateVonagePhoneNumberDto) GetFallbackDestination() *CreateVonagePhone
 		return nil
 	}
 	return c.FallbackDestination
+}
+
+func (c *CreateVonagePhoneNumberDto) GetHooks() []*PhoneNumberHookCallRinging {
+	if c == nil {
+		return nil
+	}
+	return c.Hooks
 }
 
 func (c *CreateVonagePhoneNumberDto) GetNumber() string {
@@ -1284,6 +1580,304 @@ func (s *SipAuthentication) String() string {
 	return fmt.Sprintf("%#v", s)
 }
 
+type TelnyxPhoneNumber struct {
+	// This is the fallback destination an inbound call will be transferred to if:
+	// 1. `assistantId` is not set
+	// 2. `squadId` is not set
+	// 3. and, `assistant-request` message to the `serverUrl` fails
+	//
+	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
+	FallbackDestination *TelnyxPhoneNumberFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
+	// This is the unique identifier for the phone number.
+	Id string `json:"id" url:"id"`
+	// This is the unique identifier for the org that this phone number belongs to.
+	OrgId string `json:"orgId" url:"orgId"`
+	// This is the ISO 8601 date-time string of when the phone number was created.
+	CreatedAt time.Time `json:"createdAt" url:"createdAt"`
+	// This is the ISO 8601 date-time string of when the phone number was last updated.
+	UpdatedAt time.Time `json:"updatedAt" url:"updatedAt"`
+	// This is the status of the phone number.
+	Status *TelnyxPhoneNumberStatus `json:"status,omitempty" url:"status,omitempty"`
+	// This is the name of the phone number. This is just for your own reference.
+	Name *string `json:"name,omitempty" url:"name,omitempty"`
+	// This is the assistant that will be used for incoming calls to this phone number.
+	//
+	// If neither `assistantId` nor `squadId` is set, `assistant-request` will be sent to your Server URL. Check `ServerMessage` and `ServerMessageResponse` for the shape of the message and response that is expected.
+	AssistantId *string `json:"assistantId,omitempty" url:"assistantId,omitempty"`
+	// This is the squad that will be used for incoming calls to this phone number.
+	//
+	// If neither `assistantId` nor `squadId` is set, `assistant-request` will be sent to your Server URL. Check `ServerMessage` and `ServerMessageResponse` for the shape of the message and response that is expected.
+	SquadId *string `json:"squadId,omitempty" url:"squadId,omitempty"`
+	// This is where Vapi will send webhooks. You can find all webhooks available along with their shape in ServerMessage schema.
+	//
+	// The order of precedence is:
+	//
+	// 1. assistant.server
+	// 2. phoneNumber.server
+	// 3. org.server
+	Server *Server `json:"server,omitempty" url:"server,omitempty"`
+	// These are the digits of the phone number you own on your Telnyx.
+	Number string `json:"number" url:"number"`
+	// This is the credential you added in dashboard.vapi.ai/keys. This is used to configure the number to send inbound calls to Vapi, make outbound calls and do live call updates like transfers and hangups.
+	CredentialId string `json:"credentialId" url:"credentialId"`
+	provider     string
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (t *TelnyxPhoneNumber) GetFallbackDestination() *TelnyxPhoneNumberFallbackDestination {
+	if t == nil {
+		return nil
+	}
+	return t.FallbackDestination
+}
+
+func (t *TelnyxPhoneNumber) GetHooks() []*PhoneNumberHookCallRinging {
+	if t == nil {
+		return nil
+	}
+	return t.Hooks
+}
+
+func (t *TelnyxPhoneNumber) GetId() string {
+	if t == nil {
+		return ""
+	}
+	return t.Id
+}
+
+func (t *TelnyxPhoneNumber) GetOrgId() string {
+	if t == nil {
+		return ""
+	}
+	return t.OrgId
+}
+
+func (t *TelnyxPhoneNumber) GetCreatedAt() time.Time {
+	if t == nil {
+		return time.Time{}
+	}
+	return t.CreatedAt
+}
+
+func (t *TelnyxPhoneNumber) GetUpdatedAt() time.Time {
+	if t == nil {
+		return time.Time{}
+	}
+	return t.UpdatedAt
+}
+
+func (t *TelnyxPhoneNumber) GetStatus() *TelnyxPhoneNumberStatus {
+	if t == nil {
+		return nil
+	}
+	return t.Status
+}
+
+func (t *TelnyxPhoneNumber) GetName() *string {
+	if t == nil {
+		return nil
+	}
+	return t.Name
+}
+
+func (t *TelnyxPhoneNumber) GetAssistantId() *string {
+	if t == nil {
+		return nil
+	}
+	return t.AssistantId
+}
+
+func (t *TelnyxPhoneNumber) GetSquadId() *string {
+	if t == nil {
+		return nil
+	}
+	return t.SquadId
+}
+
+func (t *TelnyxPhoneNumber) GetServer() *Server {
+	if t == nil {
+		return nil
+	}
+	return t.Server
+}
+
+func (t *TelnyxPhoneNumber) GetNumber() string {
+	if t == nil {
+		return ""
+	}
+	return t.Number
+}
+
+func (t *TelnyxPhoneNumber) GetCredentialId() string {
+	if t == nil {
+		return ""
+	}
+	return t.CredentialId
+}
+
+func (t *TelnyxPhoneNumber) Provider() string {
+	return t.provider
+}
+
+func (t *TelnyxPhoneNumber) GetExtraProperties() map[string]interface{} {
+	return t.extraProperties
+}
+
+func (t *TelnyxPhoneNumber) UnmarshalJSON(data []byte) error {
+	type embed TelnyxPhoneNumber
+	var unmarshaler = struct {
+		embed
+		CreatedAt *internal.DateTime `json:"createdAt"`
+		UpdatedAt *internal.DateTime `json:"updatedAt"`
+		Provider  string             `json:"provider"`
+	}{
+		embed: embed(*t),
+	}
+	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+		return err
+	}
+	*t = TelnyxPhoneNumber(unmarshaler.embed)
+	t.CreatedAt = unmarshaler.CreatedAt.Time()
+	t.UpdatedAt = unmarshaler.UpdatedAt.Time()
+	if unmarshaler.Provider != "telnyx" {
+		return fmt.Errorf("unexpected value for literal on type %T; expected %v got %v", t, "telnyx", unmarshaler.Provider)
+	}
+	t.provider = unmarshaler.Provider
+	extraProperties, err := internal.ExtractExtraProperties(data, *t, "provider")
+	if err != nil {
+		return err
+	}
+	t.extraProperties = extraProperties
+	t.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (t *TelnyxPhoneNumber) MarshalJSON() ([]byte, error) {
+	type embed TelnyxPhoneNumber
+	var marshaler = struct {
+		embed
+		CreatedAt *internal.DateTime `json:"createdAt"`
+		UpdatedAt *internal.DateTime `json:"updatedAt"`
+		Provider  string             `json:"provider"`
+	}{
+		embed:     embed(*t),
+		CreatedAt: internal.NewDateTime(t.CreatedAt),
+		UpdatedAt: internal.NewDateTime(t.UpdatedAt),
+		Provider:  "telnyx",
+	}
+	return json.Marshal(marshaler)
+}
+
+func (t *TelnyxPhoneNumber) String() string {
+	if len(t.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(t.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(t); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", t)
+}
+
+// This is the fallback destination an inbound call will be transferred to if:
+// 1. `assistantId` is not set
+// 2. `squadId` is not set
+// 3. and, `assistant-request` message to the `serverUrl` fails
+//
+// If this is not set and above conditions are met, the inbound call is hung up with an error message.
+type TelnyxPhoneNumberFallbackDestination struct {
+	TransferDestinationNumber *TransferDestinationNumber
+	TransferDestinationSip    *TransferDestinationSip
+
+	typ string
+}
+
+func (t *TelnyxPhoneNumberFallbackDestination) GetTransferDestinationNumber() *TransferDestinationNumber {
+	if t == nil {
+		return nil
+	}
+	return t.TransferDestinationNumber
+}
+
+func (t *TelnyxPhoneNumberFallbackDestination) GetTransferDestinationSip() *TransferDestinationSip {
+	if t == nil {
+		return nil
+	}
+	return t.TransferDestinationSip
+}
+
+func (t *TelnyxPhoneNumberFallbackDestination) UnmarshalJSON(data []byte) error {
+	valueTransferDestinationNumber := new(TransferDestinationNumber)
+	if err := json.Unmarshal(data, &valueTransferDestinationNumber); err == nil {
+		t.typ = "TransferDestinationNumber"
+		t.TransferDestinationNumber = valueTransferDestinationNumber
+		return nil
+	}
+	valueTransferDestinationSip := new(TransferDestinationSip)
+	if err := json.Unmarshal(data, &valueTransferDestinationSip); err == nil {
+		t.typ = "TransferDestinationSip"
+		t.TransferDestinationSip = valueTransferDestinationSip
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, t)
+}
+
+func (t TelnyxPhoneNumberFallbackDestination) MarshalJSON() ([]byte, error) {
+	if t.typ == "TransferDestinationNumber" || t.TransferDestinationNumber != nil {
+		return json.Marshal(t.TransferDestinationNumber)
+	}
+	if t.typ == "TransferDestinationSip" || t.TransferDestinationSip != nil {
+		return json.Marshal(t.TransferDestinationSip)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", t)
+}
+
+type TelnyxPhoneNumberFallbackDestinationVisitor interface {
+	VisitTransferDestinationNumber(*TransferDestinationNumber) error
+	VisitTransferDestinationSip(*TransferDestinationSip) error
+}
+
+func (t *TelnyxPhoneNumberFallbackDestination) Accept(visitor TelnyxPhoneNumberFallbackDestinationVisitor) error {
+	if t.typ == "TransferDestinationNumber" || t.TransferDestinationNumber != nil {
+		return visitor.VisitTransferDestinationNumber(t.TransferDestinationNumber)
+	}
+	if t.typ == "TransferDestinationSip" || t.TransferDestinationSip != nil {
+		return visitor.VisitTransferDestinationSip(t.TransferDestinationSip)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", t)
+}
+
+// This is the status of the phone number.
+type TelnyxPhoneNumberStatus string
+
+const (
+	TelnyxPhoneNumberStatusActive     TelnyxPhoneNumberStatus = "active"
+	TelnyxPhoneNumberStatusActivating TelnyxPhoneNumberStatus = "activating"
+	TelnyxPhoneNumberStatusBlocked    TelnyxPhoneNumberStatus = "blocked"
+)
+
+func NewTelnyxPhoneNumberStatusFromString(s string) (TelnyxPhoneNumberStatus, error) {
+	switch s {
+	case "active":
+		return TelnyxPhoneNumberStatusActive, nil
+	case "activating":
+		return TelnyxPhoneNumberStatusActivating, nil
+	case "blocked":
+		return TelnyxPhoneNumberStatusBlocked, nil
+	}
+	var t TelnyxPhoneNumberStatus
+	return "", fmt.Errorf("%s is not a valid %T", s, t)
+}
+
+func (t TelnyxPhoneNumberStatus) Ptr() *TelnyxPhoneNumberStatus {
+	return &t
+}
+
 type TwilioPhoneNumber struct {
 	// This is the fallback destination an inbound call will be transferred to if:
 	// 1. `assistantId` is not set
@@ -1292,6 +1886,15 @@ type TwilioPhoneNumber struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *TwilioPhoneNumberFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
+	// Controls whether Vapi sets the messaging webhook URL on the Twilio number during import.
+	//
+	// If set to `false`, Vapi will not update the Twilio messaging URL, leaving it as is.
+	// If `true` or omitted (default), Vapi will configure both the voice and messaging URLs.
+	//
+	// @default true
+	SmsEnabled *bool `json:"smsEnabled,omitempty" url:"smsEnabled,omitempty"`
 	// This is the unique identifier for the phone number.
 	Id string `json:"id" url:"id"`
 	// This is the unique identifier for the org that this phone number belongs to.
@@ -1302,6 +1905,12 @@ type TwilioPhoneNumber struct {
 	UpdatedAt time.Time `json:"updatedAt" url:"updatedAt"`
 	// This is the status of the phone number.
 	Status *TwilioPhoneNumberStatus `json:"status,omitempty" url:"status,omitempty"`
+	// This is the Twilio Auth Token for the phone number.
+	TwilioAuthToken *string `json:"twilioAuthToken,omitempty" url:"twilioAuthToken,omitempty"`
+	// This is the Twilio API Key for the phone number.
+	TwilioApiKey *string `json:"twilioApiKey,omitempty" url:"twilioApiKey,omitempty"`
+	// This is the Twilio API Secret for the phone number.
+	TwilioApiSecret *string `json:"twilioApiSecret,omitempty" url:"twilioApiSecret,omitempty"`
 	// This is the name of the phone number. This is just for your own reference.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
 	// This is the assistant that will be used for incoming calls to this phone number.
@@ -1324,9 +1933,7 @@ type TwilioPhoneNumber struct {
 	Number string `json:"number" url:"number"`
 	// This is the Twilio Account SID for the phone number.
 	TwilioAccountSid string `json:"twilioAccountSid" url:"twilioAccountSid"`
-	// This is the Twilio Auth Token for the phone number.
-	TwilioAuthToken string `json:"twilioAuthToken" url:"twilioAuthToken"`
-	provider        string
+	provider         string
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1337,6 +1944,20 @@ func (t *TwilioPhoneNumber) GetFallbackDestination() *TwilioPhoneNumberFallbackD
 		return nil
 	}
 	return t.FallbackDestination
+}
+
+func (t *TwilioPhoneNumber) GetHooks() []*PhoneNumberHookCallRinging {
+	if t == nil {
+		return nil
+	}
+	return t.Hooks
+}
+
+func (t *TwilioPhoneNumber) GetSmsEnabled() *bool {
+	if t == nil {
+		return nil
+	}
+	return t.SmsEnabled
 }
 
 func (t *TwilioPhoneNumber) GetId() string {
@@ -1372,6 +1993,27 @@ func (t *TwilioPhoneNumber) GetStatus() *TwilioPhoneNumberStatus {
 		return nil
 	}
 	return t.Status
+}
+
+func (t *TwilioPhoneNumber) GetTwilioAuthToken() *string {
+	if t == nil {
+		return nil
+	}
+	return t.TwilioAuthToken
+}
+
+func (t *TwilioPhoneNumber) GetTwilioApiKey() *string {
+	if t == nil {
+		return nil
+	}
+	return t.TwilioApiKey
+}
+
+func (t *TwilioPhoneNumber) GetTwilioApiSecret() *string {
+	if t == nil {
+		return nil
+	}
+	return t.TwilioApiSecret
 }
 
 func (t *TwilioPhoneNumber) GetName() *string {
@@ -1414,13 +2056,6 @@ func (t *TwilioPhoneNumber) GetTwilioAccountSid() string {
 		return ""
 	}
 	return t.TwilioAccountSid
-}
-
-func (t *TwilioPhoneNumber) GetTwilioAuthToken() string {
-	if t == nil {
-		return ""
-	}
-	return t.TwilioAuthToken
 }
 
 func (t *TwilioPhoneNumber) Provider() string {
@@ -1590,6 +2225,8 @@ type UpdateByoPhoneNumberDto struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *UpdateByoPhoneNumberDtoFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
 	// This is the flag to toggle the E164 check for the `number` field. This is an advanced property which should be used if you know your use case requires it.
 	//
 	// Use cases:
@@ -1634,6 +2271,13 @@ func (u *UpdateByoPhoneNumberDto) GetFallbackDestination() *UpdateByoPhoneNumber
 		return nil
 	}
 	return u.FallbackDestination
+}
+
+func (u *UpdateByoPhoneNumberDto) GetHooks() []*PhoneNumberHookCallRinging {
+	if u == nil {
+		return nil
+	}
+	return u.Hooks
 }
 
 func (u *UpdateByoPhoneNumberDto) GetNumberE164CheckEnabled() *bool {
@@ -1785,6 +2429,199 @@ func (u *UpdateByoPhoneNumberDtoFallbackDestination) Accept(visitor UpdateByoPho
 	return fmt.Errorf("type %T does not include a non-empty union type", u)
 }
 
+type UpdateTelnyxPhoneNumberDto struct {
+	// This is the fallback destination an inbound call will be transferred to if:
+	// 1. `assistantId` is not set
+	// 2. `squadId` is not set
+	// 3. and, `assistant-request` message to the `serverUrl` fails
+	//
+	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
+	FallbackDestination *UpdateTelnyxPhoneNumberDtoFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
+	// This is the name of the phone number. This is just for your own reference.
+	Name *string `json:"name,omitempty" url:"name,omitempty"`
+	// This is the assistant that will be used for incoming calls to this phone number.
+	//
+	// If neither `assistantId` nor `squadId` is set, `assistant-request` will be sent to your Server URL. Check `ServerMessage` and `ServerMessageResponse` for the shape of the message and response that is expected.
+	AssistantId *string `json:"assistantId,omitempty" url:"assistantId,omitempty"`
+	// This is the squad that will be used for incoming calls to this phone number.
+	//
+	// If neither `assistantId` nor `squadId` is set, `assistant-request` will be sent to your Server URL. Check `ServerMessage` and `ServerMessageResponse` for the shape of the message and response that is expected.
+	SquadId *string `json:"squadId,omitempty" url:"squadId,omitempty"`
+	// This is where Vapi will send webhooks. You can find all webhooks available along with their shape in ServerMessage schema.
+	//
+	// The order of precedence is:
+	//
+	// 1. assistant.server
+	// 2. phoneNumber.server
+	// 3. org.server
+	Server *Server `json:"server,omitempty" url:"server,omitempty"`
+	// These are the digits of the phone number you own on your Telnyx.
+	Number *string `json:"number,omitempty" url:"number,omitempty"`
+	// This is the credential you added in dashboard.vapi.ai/keys. This is used to configure the number to send inbound calls to Vapi, make outbound calls and do live call updates like transfers and hangups.
+	CredentialId *string `json:"credentialId,omitempty" url:"credentialId,omitempty"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) GetFallbackDestination() *UpdateTelnyxPhoneNumberDtoFallbackDestination {
+	if u == nil {
+		return nil
+	}
+	return u.FallbackDestination
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) GetHooks() []*PhoneNumberHookCallRinging {
+	if u == nil {
+		return nil
+	}
+	return u.Hooks
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) GetName() *string {
+	if u == nil {
+		return nil
+	}
+	return u.Name
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) GetAssistantId() *string {
+	if u == nil {
+		return nil
+	}
+	return u.AssistantId
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) GetSquadId() *string {
+	if u == nil {
+		return nil
+	}
+	return u.SquadId
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) GetServer() *Server {
+	if u == nil {
+		return nil
+	}
+	return u.Server
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) GetNumber() *string {
+	if u == nil {
+		return nil
+	}
+	return u.Number
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) GetCredentialId() *string {
+	if u == nil {
+		return nil
+	}
+	return u.CredentialId
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) GetExtraProperties() map[string]interface{} {
+	return u.extraProperties
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) UnmarshalJSON(data []byte) error {
+	type unmarshaler UpdateTelnyxPhoneNumberDto
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*u = UpdateTelnyxPhoneNumberDto(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *u)
+	if err != nil {
+		return err
+	}
+	u.extraProperties = extraProperties
+	u.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (u *UpdateTelnyxPhoneNumberDto) String() string {
+	if len(u.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(u.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(u); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", u)
+}
+
+// This is the fallback destination an inbound call will be transferred to if:
+// 1. `assistantId` is not set
+// 2. `squadId` is not set
+// 3. and, `assistant-request` message to the `serverUrl` fails
+//
+// If this is not set and above conditions are met, the inbound call is hung up with an error message.
+type UpdateTelnyxPhoneNumberDtoFallbackDestination struct {
+	TransferDestinationNumber *TransferDestinationNumber
+	TransferDestinationSip    *TransferDestinationSip
+
+	typ string
+}
+
+func (u *UpdateTelnyxPhoneNumberDtoFallbackDestination) GetTransferDestinationNumber() *TransferDestinationNumber {
+	if u == nil {
+		return nil
+	}
+	return u.TransferDestinationNumber
+}
+
+func (u *UpdateTelnyxPhoneNumberDtoFallbackDestination) GetTransferDestinationSip() *TransferDestinationSip {
+	if u == nil {
+		return nil
+	}
+	return u.TransferDestinationSip
+}
+
+func (u *UpdateTelnyxPhoneNumberDtoFallbackDestination) UnmarshalJSON(data []byte) error {
+	valueTransferDestinationNumber := new(TransferDestinationNumber)
+	if err := json.Unmarshal(data, &valueTransferDestinationNumber); err == nil {
+		u.typ = "TransferDestinationNumber"
+		u.TransferDestinationNumber = valueTransferDestinationNumber
+		return nil
+	}
+	valueTransferDestinationSip := new(TransferDestinationSip)
+	if err := json.Unmarshal(data, &valueTransferDestinationSip); err == nil {
+		u.typ = "TransferDestinationSip"
+		u.TransferDestinationSip = valueTransferDestinationSip
+		return nil
+	}
+	return fmt.Errorf("%s cannot be deserialized as a %T", data, u)
+}
+
+func (u UpdateTelnyxPhoneNumberDtoFallbackDestination) MarshalJSON() ([]byte, error) {
+	if u.typ == "TransferDestinationNumber" || u.TransferDestinationNumber != nil {
+		return json.Marshal(u.TransferDestinationNumber)
+	}
+	if u.typ == "TransferDestinationSip" || u.TransferDestinationSip != nil {
+		return json.Marshal(u.TransferDestinationSip)
+	}
+	return nil, fmt.Errorf("type %T does not include a non-empty union type", u)
+}
+
+type UpdateTelnyxPhoneNumberDtoFallbackDestinationVisitor interface {
+	VisitTransferDestinationNumber(*TransferDestinationNumber) error
+	VisitTransferDestinationSip(*TransferDestinationSip) error
+}
+
+func (u *UpdateTelnyxPhoneNumberDtoFallbackDestination) Accept(visitor UpdateTelnyxPhoneNumberDtoFallbackDestinationVisitor) error {
+	if u.typ == "TransferDestinationNumber" || u.TransferDestinationNumber != nil {
+		return visitor.VisitTransferDestinationNumber(u.TransferDestinationNumber)
+	}
+	if u.typ == "TransferDestinationSip" || u.TransferDestinationSip != nil {
+		return visitor.VisitTransferDestinationSip(u.TransferDestinationSip)
+	}
+	return fmt.Errorf("type %T does not include a non-empty union type", u)
+}
+
 type UpdateTwilioPhoneNumberDto struct {
 	// This is the fallback destination an inbound call will be transferred to if:
 	// 1. `assistantId` is not set
@@ -1793,6 +2630,15 @@ type UpdateTwilioPhoneNumberDto struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *UpdateTwilioPhoneNumberDtoFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
+	// Controls whether Vapi sets the messaging webhook URL on the Twilio number during import.
+	//
+	// If set to `false`, Vapi will not update the Twilio messaging URL, leaving it as is.
+	// If `true` or omitted (default), Vapi will configure both the voice and messaging URLs.
+	//
+	// @default true
+	SmsEnabled *bool `json:"smsEnabled,omitempty" url:"smsEnabled,omitempty"`
 	// This is the name of the phone number. This is just for your own reference.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
 	// This is the assistant that will be used for incoming calls to this phone number.
@@ -1817,6 +2663,10 @@ type UpdateTwilioPhoneNumberDto struct {
 	TwilioAccountSid *string `json:"twilioAccountSid,omitempty" url:"twilioAccountSid,omitempty"`
 	// This is the Twilio Auth Token for the phone number.
 	TwilioAuthToken *string `json:"twilioAuthToken,omitempty" url:"twilioAuthToken,omitempty"`
+	// This is the Twilio API Key for the phone number.
+	TwilioApiKey *string `json:"twilioApiKey,omitempty" url:"twilioApiKey,omitempty"`
+	// This is the Twilio API Secret for the phone number.
+	TwilioApiSecret *string `json:"twilioApiSecret,omitempty" url:"twilioApiSecret,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -1827,6 +2677,20 @@ func (u *UpdateTwilioPhoneNumberDto) GetFallbackDestination() *UpdateTwilioPhone
 		return nil
 	}
 	return u.FallbackDestination
+}
+
+func (u *UpdateTwilioPhoneNumberDto) GetHooks() []*PhoneNumberHookCallRinging {
+	if u == nil {
+		return nil
+	}
+	return u.Hooks
+}
+
+func (u *UpdateTwilioPhoneNumberDto) GetSmsEnabled() *bool {
+	if u == nil {
+		return nil
+	}
+	return u.SmsEnabled
 }
 
 func (u *UpdateTwilioPhoneNumberDto) GetName() *string {
@@ -1876,6 +2740,20 @@ func (u *UpdateTwilioPhoneNumberDto) GetTwilioAuthToken() *string {
 		return nil
 	}
 	return u.TwilioAuthToken
+}
+
+func (u *UpdateTwilioPhoneNumberDto) GetTwilioApiKey() *string {
+	if u == nil {
+		return nil
+	}
+	return u.TwilioApiKey
+}
+
+func (u *UpdateTwilioPhoneNumberDto) GetTwilioApiSecret() *string {
+	if u == nil {
+		return nil
+	}
+	return u.TwilioApiSecret
 }
 
 func (u *UpdateTwilioPhoneNumberDto) GetExtraProperties() map[string]interface{} {
@@ -1986,6 +2864,8 @@ type UpdateVapiPhoneNumberDto struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *UpdateVapiPhoneNumberDtoFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
 	// This is the name of the phone number. This is just for your own reference.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
 	// This is the assistant that will be used for incoming calls to this phone number.
@@ -2022,6 +2902,13 @@ func (u *UpdateVapiPhoneNumberDto) GetFallbackDestination() *UpdateVapiPhoneNumb
 		return nil
 	}
 	return u.FallbackDestination
+}
+
+func (u *UpdateVapiPhoneNumberDto) GetHooks() []*PhoneNumberHookCallRinging {
+	if u == nil {
+		return nil
+	}
+	return u.Hooks
 }
 
 func (u *UpdateVapiPhoneNumberDto) GetName() *string {
@@ -2174,6 +3061,8 @@ type UpdateVonagePhoneNumberDto struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *UpdateVonagePhoneNumberDtoFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
 	// This is the name of the phone number. This is just for your own reference.
 	Name *string `json:"name,omitempty" url:"name,omitempty"`
 	// This is the assistant that will be used for incoming calls to this phone number.
@@ -2194,7 +3083,7 @@ type UpdateVonagePhoneNumberDto struct {
 	Server *Server `json:"server,omitempty" url:"server,omitempty"`
 	// These are the digits of the phone number you own on your Vonage.
 	Number *string `json:"number,omitempty" url:"number,omitempty"`
-	// This is the credential that is used to make outgoing calls, and do operations like call transfer and hang up.
+	// This is the credential you added in dashboard.vapi.ai/keys. This is used to configure the number to send inbound calls to Vapi, make outbound calls and do live call updates like transfers and hangups.
 	CredentialId *string `json:"credentialId,omitempty" url:"credentialId,omitempty"`
 
 	extraProperties map[string]interface{}
@@ -2206,6 +3095,13 @@ func (u *UpdateVonagePhoneNumberDto) GetFallbackDestination() *UpdateVonagePhone
 		return nil
 	}
 	return u.FallbackDestination
+}
+
+func (u *UpdateVonagePhoneNumberDto) GetHooks() []*PhoneNumberHookCallRinging {
+	if u == nil {
+		return nil
+	}
+	return u.Hooks
 }
 
 func (u *UpdateVonagePhoneNumberDto) GetName() *string {
@@ -2358,6 +3254,8 @@ type VapiPhoneNumber struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *VapiPhoneNumberFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
 	// This is the unique identifier for the phone number.
 	Id string `json:"id" url:"id"`
 	// This is the unique identifier for the org that this phone number belongs to.
@@ -2409,6 +3307,13 @@ func (v *VapiPhoneNumber) GetFallbackDestination() *VapiPhoneNumberFallbackDesti
 		return nil
 	}
 	return v.FallbackDestination
+}
+
+func (v *VapiPhoneNumber) GetHooks() []*PhoneNumberHookCallRinging {
+	if v == nil {
+		return nil
+	}
+	return v.Hooks
 }
 
 func (v *VapiPhoneNumber) GetId() string {
@@ -2669,6 +3574,8 @@ type VonagePhoneNumber struct {
 	//
 	// If this is not set and above conditions are met, the inbound call is hung up with an error message.
 	FallbackDestination *VonagePhoneNumberFallbackDestination `json:"fallbackDestination,omitempty" url:"fallbackDestination,omitempty"`
+	// This is the hooks that will be used for incoming calls to this phone number.
+	Hooks []*PhoneNumberHookCallRinging `json:"hooks,omitempty" url:"hooks,omitempty"`
 	// This is the unique identifier for the phone number.
 	Id string `json:"id" url:"id"`
 	// This is the unique identifier for the org that this phone number belongs to.
@@ -2699,7 +3606,7 @@ type VonagePhoneNumber struct {
 	Server *Server `json:"server,omitempty" url:"server,omitempty"`
 	// These are the digits of the phone number you own on your Vonage.
 	Number string `json:"number" url:"number"`
-	// This is the credential that is used to make outgoing calls, and do operations like call transfer and hang up.
+	// This is the credential you added in dashboard.vapi.ai/keys. This is used to configure the number to send inbound calls to Vapi, make outbound calls and do live call updates like transfers and hangups.
 	CredentialId string `json:"credentialId" url:"credentialId"`
 	provider     string
 
@@ -2712,6 +3619,13 @@ func (v *VonagePhoneNumber) GetFallbackDestination() *VonagePhoneNumberFallbackD
 		return nil
 	}
 	return v.FallbackDestination
+}
+
+func (v *VonagePhoneNumber) GetHooks() []*PhoneNumberHookCallRinging {
+	if v == nil {
+		return nil
+	}
+	return v.Hooks
 }
 
 func (v *VonagePhoneNumber) GetId() string {
@@ -2955,6 +3869,7 @@ type PhoneNumbersCreateRequest struct {
 	CreateTwilioPhoneNumberDto *CreateTwilioPhoneNumberDto
 	CreateVonagePhoneNumberDto *CreateVonagePhoneNumberDto
 	CreateVapiPhoneNumberDto   *CreateVapiPhoneNumberDto
+	CreateTelnyxPhoneNumberDto *CreateTelnyxPhoneNumberDto
 
 	typ string
 }
@@ -2987,6 +3902,13 @@ func (p *PhoneNumbersCreateRequest) GetCreateVapiPhoneNumberDto() *CreateVapiPho
 	return p.CreateVapiPhoneNumberDto
 }
 
+func (p *PhoneNumbersCreateRequest) GetCreateTelnyxPhoneNumberDto() *CreateTelnyxPhoneNumberDto {
+	if p == nil {
+		return nil
+	}
+	return p.CreateTelnyxPhoneNumberDto
+}
+
 func (p *PhoneNumbersCreateRequest) UnmarshalJSON(data []byte) error {
 	valueCreateByoPhoneNumberDto := new(CreateByoPhoneNumberDto)
 	if err := json.Unmarshal(data, &valueCreateByoPhoneNumberDto); err == nil {
@@ -3012,6 +3934,12 @@ func (p *PhoneNumbersCreateRequest) UnmarshalJSON(data []byte) error {
 		p.CreateVapiPhoneNumberDto = valueCreateVapiPhoneNumberDto
 		return nil
 	}
+	valueCreateTelnyxPhoneNumberDto := new(CreateTelnyxPhoneNumberDto)
+	if err := json.Unmarshal(data, &valueCreateTelnyxPhoneNumberDto); err == nil {
+		p.typ = "CreateTelnyxPhoneNumberDto"
+		p.CreateTelnyxPhoneNumberDto = valueCreateTelnyxPhoneNumberDto
+		return nil
+	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
 }
 
@@ -3028,6 +3956,9 @@ func (p PhoneNumbersCreateRequest) MarshalJSON() ([]byte, error) {
 	if p.typ == "CreateVapiPhoneNumberDto" || p.CreateVapiPhoneNumberDto != nil {
 		return json.Marshal(p.CreateVapiPhoneNumberDto)
 	}
+	if p.typ == "CreateTelnyxPhoneNumberDto" || p.CreateTelnyxPhoneNumberDto != nil {
+		return json.Marshal(p.CreateTelnyxPhoneNumberDto)
+	}
 	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3036,6 +3967,7 @@ type PhoneNumbersCreateRequestVisitor interface {
 	VisitCreateTwilioPhoneNumberDto(*CreateTwilioPhoneNumberDto) error
 	VisitCreateVonagePhoneNumberDto(*CreateVonagePhoneNumberDto) error
 	VisitCreateVapiPhoneNumberDto(*CreateVapiPhoneNumberDto) error
+	VisitCreateTelnyxPhoneNumberDto(*CreateTelnyxPhoneNumberDto) error
 }
 
 func (p *PhoneNumbersCreateRequest) Accept(visitor PhoneNumbersCreateRequestVisitor) error {
@@ -3051,6 +3983,9 @@ func (p *PhoneNumbersCreateRequest) Accept(visitor PhoneNumbersCreateRequestVisi
 	if p.typ == "CreateVapiPhoneNumberDto" || p.CreateVapiPhoneNumberDto != nil {
 		return visitor.VisitCreateVapiPhoneNumberDto(p.CreateVapiPhoneNumberDto)
 	}
+	if p.typ == "CreateTelnyxPhoneNumberDto" || p.CreateTelnyxPhoneNumberDto != nil {
+		return visitor.VisitCreateTelnyxPhoneNumberDto(p.CreateTelnyxPhoneNumberDto)
+	}
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3059,6 +3994,7 @@ type PhoneNumbersCreateResponse struct {
 	TwilioPhoneNumber *TwilioPhoneNumber
 	VonagePhoneNumber *VonagePhoneNumber
 	VapiPhoneNumber   *VapiPhoneNumber
+	TelnyxPhoneNumber *TelnyxPhoneNumber
 
 	typ string
 }
@@ -3091,6 +4027,13 @@ func (p *PhoneNumbersCreateResponse) GetVapiPhoneNumber() *VapiPhoneNumber {
 	return p.VapiPhoneNumber
 }
 
+func (p *PhoneNumbersCreateResponse) GetTelnyxPhoneNumber() *TelnyxPhoneNumber {
+	if p == nil {
+		return nil
+	}
+	return p.TelnyxPhoneNumber
+}
+
 func (p *PhoneNumbersCreateResponse) UnmarshalJSON(data []byte) error {
 	valueByoPhoneNumber := new(ByoPhoneNumber)
 	if err := json.Unmarshal(data, &valueByoPhoneNumber); err == nil {
@@ -3116,6 +4059,12 @@ func (p *PhoneNumbersCreateResponse) UnmarshalJSON(data []byte) error {
 		p.VapiPhoneNumber = valueVapiPhoneNumber
 		return nil
 	}
+	valueTelnyxPhoneNumber := new(TelnyxPhoneNumber)
+	if err := json.Unmarshal(data, &valueTelnyxPhoneNumber); err == nil {
+		p.typ = "TelnyxPhoneNumber"
+		p.TelnyxPhoneNumber = valueTelnyxPhoneNumber
+		return nil
+	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
 }
 
@@ -3132,6 +4081,9 @@ func (p PhoneNumbersCreateResponse) MarshalJSON() ([]byte, error) {
 	if p.typ == "VapiPhoneNumber" || p.VapiPhoneNumber != nil {
 		return json.Marshal(p.VapiPhoneNumber)
 	}
+	if p.typ == "TelnyxPhoneNumber" || p.TelnyxPhoneNumber != nil {
+		return json.Marshal(p.TelnyxPhoneNumber)
+	}
 	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3140,6 +4092,7 @@ type PhoneNumbersCreateResponseVisitor interface {
 	VisitTwilioPhoneNumber(*TwilioPhoneNumber) error
 	VisitVonagePhoneNumber(*VonagePhoneNumber) error
 	VisitVapiPhoneNumber(*VapiPhoneNumber) error
+	VisitTelnyxPhoneNumber(*TelnyxPhoneNumber) error
 }
 
 func (p *PhoneNumbersCreateResponse) Accept(visitor PhoneNumbersCreateResponseVisitor) error {
@@ -3155,6 +4108,9 @@ func (p *PhoneNumbersCreateResponse) Accept(visitor PhoneNumbersCreateResponseVi
 	if p.typ == "VapiPhoneNumber" || p.VapiPhoneNumber != nil {
 		return visitor.VisitVapiPhoneNumber(p.VapiPhoneNumber)
 	}
+	if p.typ == "TelnyxPhoneNumber" || p.TelnyxPhoneNumber != nil {
+		return visitor.VisitTelnyxPhoneNumber(p.TelnyxPhoneNumber)
+	}
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3163,6 +4119,7 @@ type PhoneNumbersDeleteResponse struct {
 	TwilioPhoneNumber *TwilioPhoneNumber
 	VonagePhoneNumber *VonagePhoneNumber
 	VapiPhoneNumber   *VapiPhoneNumber
+	TelnyxPhoneNumber *TelnyxPhoneNumber
 
 	typ string
 }
@@ -3195,6 +4152,13 @@ func (p *PhoneNumbersDeleteResponse) GetVapiPhoneNumber() *VapiPhoneNumber {
 	return p.VapiPhoneNumber
 }
 
+func (p *PhoneNumbersDeleteResponse) GetTelnyxPhoneNumber() *TelnyxPhoneNumber {
+	if p == nil {
+		return nil
+	}
+	return p.TelnyxPhoneNumber
+}
+
 func (p *PhoneNumbersDeleteResponse) UnmarshalJSON(data []byte) error {
 	valueByoPhoneNumber := new(ByoPhoneNumber)
 	if err := json.Unmarshal(data, &valueByoPhoneNumber); err == nil {
@@ -3220,6 +4184,12 @@ func (p *PhoneNumbersDeleteResponse) UnmarshalJSON(data []byte) error {
 		p.VapiPhoneNumber = valueVapiPhoneNumber
 		return nil
 	}
+	valueTelnyxPhoneNumber := new(TelnyxPhoneNumber)
+	if err := json.Unmarshal(data, &valueTelnyxPhoneNumber); err == nil {
+		p.typ = "TelnyxPhoneNumber"
+		p.TelnyxPhoneNumber = valueTelnyxPhoneNumber
+		return nil
+	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
 }
 
@@ -3236,6 +4206,9 @@ func (p PhoneNumbersDeleteResponse) MarshalJSON() ([]byte, error) {
 	if p.typ == "VapiPhoneNumber" || p.VapiPhoneNumber != nil {
 		return json.Marshal(p.VapiPhoneNumber)
 	}
+	if p.typ == "TelnyxPhoneNumber" || p.TelnyxPhoneNumber != nil {
+		return json.Marshal(p.TelnyxPhoneNumber)
+	}
 	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3244,6 +4217,7 @@ type PhoneNumbersDeleteResponseVisitor interface {
 	VisitTwilioPhoneNumber(*TwilioPhoneNumber) error
 	VisitVonagePhoneNumber(*VonagePhoneNumber) error
 	VisitVapiPhoneNumber(*VapiPhoneNumber) error
+	VisitTelnyxPhoneNumber(*TelnyxPhoneNumber) error
 }
 
 func (p *PhoneNumbersDeleteResponse) Accept(visitor PhoneNumbersDeleteResponseVisitor) error {
@@ -3259,6 +4233,9 @@ func (p *PhoneNumbersDeleteResponse) Accept(visitor PhoneNumbersDeleteResponseVi
 	if p.typ == "VapiPhoneNumber" || p.VapiPhoneNumber != nil {
 		return visitor.VisitVapiPhoneNumber(p.VapiPhoneNumber)
 	}
+	if p.typ == "TelnyxPhoneNumber" || p.TelnyxPhoneNumber != nil {
+		return visitor.VisitTelnyxPhoneNumber(p.TelnyxPhoneNumber)
+	}
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3267,6 +4244,7 @@ type PhoneNumbersGetResponse struct {
 	TwilioPhoneNumber *TwilioPhoneNumber
 	VonagePhoneNumber *VonagePhoneNumber
 	VapiPhoneNumber   *VapiPhoneNumber
+	TelnyxPhoneNumber *TelnyxPhoneNumber
 
 	typ string
 }
@@ -3299,6 +4277,13 @@ func (p *PhoneNumbersGetResponse) GetVapiPhoneNumber() *VapiPhoneNumber {
 	return p.VapiPhoneNumber
 }
 
+func (p *PhoneNumbersGetResponse) GetTelnyxPhoneNumber() *TelnyxPhoneNumber {
+	if p == nil {
+		return nil
+	}
+	return p.TelnyxPhoneNumber
+}
+
 func (p *PhoneNumbersGetResponse) UnmarshalJSON(data []byte) error {
 	valueByoPhoneNumber := new(ByoPhoneNumber)
 	if err := json.Unmarshal(data, &valueByoPhoneNumber); err == nil {
@@ -3324,6 +4309,12 @@ func (p *PhoneNumbersGetResponse) UnmarshalJSON(data []byte) error {
 		p.VapiPhoneNumber = valueVapiPhoneNumber
 		return nil
 	}
+	valueTelnyxPhoneNumber := new(TelnyxPhoneNumber)
+	if err := json.Unmarshal(data, &valueTelnyxPhoneNumber); err == nil {
+		p.typ = "TelnyxPhoneNumber"
+		p.TelnyxPhoneNumber = valueTelnyxPhoneNumber
+		return nil
+	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
 }
 
@@ -3340,6 +4331,9 @@ func (p PhoneNumbersGetResponse) MarshalJSON() ([]byte, error) {
 	if p.typ == "VapiPhoneNumber" || p.VapiPhoneNumber != nil {
 		return json.Marshal(p.VapiPhoneNumber)
 	}
+	if p.typ == "TelnyxPhoneNumber" || p.TelnyxPhoneNumber != nil {
+		return json.Marshal(p.TelnyxPhoneNumber)
+	}
 	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3348,6 +4342,7 @@ type PhoneNumbersGetResponseVisitor interface {
 	VisitTwilioPhoneNumber(*TwilioPhoneNumber) error
 	VisitVonagePhoneNumber(*VonagePhoneNumber) error
 	VisitVapiPhoneNumber(*VapiPhoneNumber) error
+	VisitTelnyxPhoneNumber(*TelnyxPhoneNumber) error
 }
 
 func (p *PhoneNumbersGetResponse) Accept(visitor PhoneNumbersGetResponseVisitor) error {
@@ -3363,6 +4358,9 @@ func (p *PhoneNumbersGetResponse) Accept(visitor PhoneNumbersGetResponseVisitor)
 	if p.typ == "VapiPhoneNumber" || p.VapiPhoneNumber != nil {
 		return visitor.VisitVapiPhoneNumber(p.VapiPhoneNumber)
 	}
+	if p.typ == "TelnyxPhoneNumber" || p.TelnyxPhoneNumber != nil {
+		return visitor.VisitTelnyxPhoneNumber(p.TelnyxPhoneNumber)
+	}
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3371,6 +4369,7 @@ type PhoneNumbersListResponseItem struct {
 	TwilioPhoneNumber *TwilioPhoneNumber
 	VonagePhoneNumber *VonagePhoneNumber
 	VapiPhoneNumber   *VapiPhoneNumber
+	TelnyxPhoneNumber *TelnyxPhoneNumber
 
 	typ string
 }
@@ -3403,6 +4402,13 @@ func (p *PhoneNumbersListResponseItem) GetVapiPhoneNumber() *VapiPhoneNumber {
 	return p.VapiPhoneNumber
 }
 
+func (p *PhoneNumbersListResponseItem) GetTelnyxPhoneNumber() *TelnyxPhoneNumber {
+	if p == nil {
+		return nil
+	}
+	return p.TelnyxPhoneNumber
+}
+
 func (p *PhoneNumbersListResponseItem) UnmarshalJSON(data []byte) error {
 	valueByoPhoneNumber := new(ByoPhoneNumber)
 	if err := json.Unmarshal(data, &valueByoPhoneNumber); err == nil {
@@ -3428,6 +4434,12 @@ func (p *PhoneNumbersListResponseItem) UnmarshalJSON(data []byte) error {
 		p.VapiPhoneNumber = valueVapiPhoneNumber
 		return nil
 	}
+	valueTelnyxPhoneNumber := new(TelnyxPhoneNumber)
+	if err := json.Unmarshal(data, &valueTelnyxPhoneNumber); err == nil {
+		p.typ = "TelnyxPhoneNumber"
+		p.TelnyxPhoneNumber = valueTelnyxPhoneNumber
+		return nil
+	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
 }
 
@@ -3444,6 +4456,9 @@ func (p PhoneNumbersListResponseItem) MarshalJSON() ([]byte, error) {
 	if p.typ == "VapiPhoneNumber" || p.VapiPhoneNumber != nil {
 		return json.Marshal(p.VapiPhoneNumber)
 	}
+	if p.typ == "TelnyxPhoneNumber" || p.TelnyxPhoneNumber != nil {
+		return json.Marshal(p.TelnyxPhoneNumber)
+	}
 	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3452,6 +4467,7 @@ type PhoneNumbersListResponseItemVisitor interface {
 	VisitTwilioPhoneNumber(*TwilioPhoneNumber) error
 	VisitVonagePhoneNumber(*VonagePhoneNumber) error
 	VisitVapiPhoneNumber(*VapiPhoneNumber) error
+	VisitTelnyxPhoneNumber(*TelnyxPhoneNumber) error
 }
 
 func (p *PhoneNumbersListResponseItem) Accept(visitor PhoneNumbersListResponseItemVisitor) error {
@@ -3467,6 +4483,9 @@ func (p *PhoneNumbersListResponseItem) Accept(visitor PhoneNumbersListResponseIt
 	if p.typ == "VapiPhoneNumber" || p.VapiPhoneNumber != nil {
 		return visitor.VisitVapiPhoneNumber(p.VapiPhoneNumber)
 	}
+	if p.typ == "TelnyxPhoneNumber" || p.TelnyxPhoneNumber != nil {
+		return visitor.VisitTelnyxPhoneNumber(p.TelnyxPhoneNumber)
+	}
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3475,6 +4494,7 @@ type PhoneNumbersUpdateRequest struct {
 	UpdateTwilioPhoneNumberDto *UpdateTwilioPhoneNumberDto
 	UpdateVonagePhoneNumberDto *UpdateVonagePhoneNumberDto
 	UpdateVapiPhoneNumberDto   *UpdateVapiPhoneNumberDto
+	UpdateTelnyxPhoneNumberDto *UpdateTelnyxPhoneNumberDto
 
 	typ string
 }
@@ -3507,6 +4527,13 @@ func (p *PhoneNumbersUpdateRequest) GetUpdateVapiPhoneNumberDto() *UpdateVapiPho
 	return p.UpdateVapiPhoneNumberDto
 }
 
+func (p *PhoneNumbersUpdateRequest) GetUpdateTelnyxPhoneNumberDto() *UpdateTelnyxPhoneNumberDto {
+	if p == nil {
+		return nil
+	}
+	return p.UpdateTelnyxPhoneNumberDto
+}
+
 func (p *PhoneNumbersUpdateRequest) UnmarshalJSON(data []byte) error {
 	valueUpdateByoPhoneNumberDto := new(UpdateByoPhoneNumberDto)
 	if err := json.Unmarshal(data, &valueUpdateByoPhoneNumberDto); err == nil {
@@ -3532,6 +4559,12 @@ func (p *PhoneNumbersUpdateRequest) UnmarshalJSON(data []byte) error {
 		p.UpdateVapiPhoneNumberDto = valueUpdateVapiPhoneNumberDto
 		return nil
 	}
+	valueUpdateTelnyxPhoneNumberDto := new(UpdateTelnyxPhoneNumberDto)
+	if err := json.Unmarshal(data, &valueUpdateTelnyxPhoneNumberDto); err == nil {
+		p.typ = "UpdateTelnyxPhoneNumberDto"
+		p.UpdateTelnyxPhoneNumberDto = valueUpdateTelnyxPhoneNumberDto
+		return nil
+	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
 }
 
@@ -3548,6 +4581,9 @@ func (p PhoneNumbersUpdateRequest) MarshalJSON() ([]byte, error) {
 	if p.typ == "UpdateVapiPhoneNumberDto" || p.UpdateVapiPhoneNumberDto != nil {
 		return json.Marshal(p.UpdateVapiPhoneNumberDto)
 	}
+	if p.typ == "UpdateTelnyxPhoneNumberDto" || p.UpdateTelnyxPhoneNumberDto != nil {
+		return json.Marshal(p.UpdateTelnyxPhoneNumberDto)
+	}
 	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3556,6 +4592,7 @@ type PhoneNumbersUpdateRequestVisitor interface {
 	VisitUpdateTwilioPhoneNumberDto(*UpdateTwilioPhoneNumberDto) error
 	VisitUpdateVonagePhoneNumberDto(*UpdateVonagePhoneNumberDto) error
 	VisitUpdateVapiPhoneNumberDto(*UpdateVapiPhoneNumberDto) error
+	VisitUpdateTelnyxPhoneNumberDto(*UpdateTelnyxPhoneNumberDto) error
 }
 
 func (p *PhoneNumbersUpdateRequest) Accept(visitor PhoneNumbersUpdateRequestVisitor) error {
@@ -3571,6 +4608,9 @@ func (p *PhoneNumbersUpdateRequest) Accept(visitor PhoneNumbersUpdateRequestVisi
 	if p.typ == "UpdateVapiPhoneNumberDto" || p.UpdateVapiPhoneNumberDto != nil {
 		return visitor.VisitUpdateVapiPhoneNumberDto(p.UpdateVapiPhoneNumberDto)
 	}
+	if p.typ == "UpdateTelnyxPhoneNumberDto" || p.UpdateTelnyxPhoneNumberDto != nil {
+		return visitor.VisitUpdateTelnyxPhoneNumberDto(p.UpdateTelnyxPhoneNumberDto)
+	}
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3579,6 +4619,7 @@ type PhoneNumbersUpdateResponse struct {
 	TwilioPhoneNumber *TwilioPhoneNumber
 	VonagePhoneNumber *VonagePhoneNumber
 	VapiPhoneNumber   *VapiPhoneNumber
+	TelnyxPhoneNumber *TelnyxPhoneNumber
 
 	typ string
 }
@@ -3611,6 +4652,13 @@ func (p *PhoneNumbersUpdateResponse) GetVapiPhoneNumber() *VapiPhoneNumber {
 	return p.VapiPhoneNumber
 }
 
+func (p *PhoneNumbersUpdateResponse) GetTelnyxPhoneNumber() *TelnyxPhoneNumber {
+	if p == nil {
+		return nil
+	}
+	return p.TelnyxPhoneNumber
+}
+
 func (p *PhoneNumbersUpdateResponse) UnmarshalJSON(data []byte) error {
 	valueByoPhoneNumber := new(ByoPhoneNumber)
 	if err := json.Unmarshal(data, &valueByoPhoneNumber); err == nil {
@@ -3636,6 +4684,12 @@ func (p *PhoneNumbersUpdateResponse) UnmarshalJSON(data []byte) error {
 		p.VapiPhoneNumber = valueVapiPhoneNumber
 		return nil
 	}
+	valueTelnyxPhoneNumber := new(TelnyxPhoneNumber)
+	if err := json.Unmarshal(data, &valueTelnyxPhoneNumber); err == nil {
+		p.typ = "TelnyxPhoneNumber"
+		p.TelnyxPhoneNumber = valueTelnyxPhoneNumber
+		return nil
+	}
 	return fmt.Errorf("%s cannot be deserialized as a %T", data, p)
 }
 
@@ -3652,6 +4706,9 @@ func (p PhoneNumbersUpdateResponse) MarshalJSON() ([]byte, error) {
 	if p.typ == "VapiPhoneNumber" || p.VapiPhoneNumber != nil {
 		return json.Marshal(p.VapiPhoneNumber)
 	}
+	if p.typ == "TelnyxPhoneNumber" || p.TelnyxPhoneNumber != nil {
+		return json.Marshal(p.TelnyxPhoneNumber)
+	}
 	return nil, fmt.Errorf("type %T does not include a non-empty union type", p)
 }
 
@@ -3660,6 +4717,7 @@ type PhoneNumbersUpdateResponseVisitor interface {
 	VisitTwilioPhoneNumber(*TwilioPhoneNumber) error
 	VisitVonagePhoneNumber(*VonagePhoneNumber) error
 	VisitVapiPhoneNumber(*VapiPhoneNumber) error
+	VisitTelnyxPhoneNumber(*TelnyxPhoneNumber) error
 }
 
 func (p *PhoneNumbersUpdateResponse) Accept(visitor PhoneNumbersUpdateResponseVisitor) error {
@@ -3674,6 +4732,9 @@ func (p *PhoneNumbersUpdateResponse) Accept(visitor PhoneNumbersUpdateResponseVi
 	}
 	if p.typ == "VapiPhoneNumber" || p.VapiPhoneNumber != nil {
 		return visitor.VisitVapiPhoneNumber(p.VapiPhoneNumber)
+	}
+	if p.typ == "TelnyxPhoneNumber" || p.TelnyxPhoneNumber != nil {
+		return visitor.VisitTelnyxPhoneNumber(p.TelnyxPhoneNumber)
 	}
 	return fmt.Errorf("type %T does not include a non-empty union type", p)
 }
