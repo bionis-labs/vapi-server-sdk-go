@@ -77381,13 +77381,13 @@ func (w *WebhookCredential) String() string {
 type Workflow struct {
 	Nodes []*WorkflowNodesItem `json:"nodes,omitempty" url:"nodes,omitempty"`
 	// These are the options for the workflow's LLM.
-	Model     *WorkflowModel `json:"model,omitempty" url:"model,omitempty"`
-	Id        string         `json:"id" url:"id"`
-	OrgId     string         `json:"orgId" url:"orgId"`
-	CreatedAt time.Time      `json:"createdAt" url:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt" url:"updatedAt"`
-	Name      string         `json:"name" url:"name"`
-	Edges     []*Edge        `json:"edges,omitempty" url:"edges,omitempty"`
+	Model *WorkflowModel `json:"model,omitempty" url:"model,omitempty"`
+	// Id        string         `json:"id" url:"id"`
+	OrgId     string    `json:"orgId" url:"orgId"`
+	CreatedAt time.Time `json:"createdAt" url:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt" url:"updatedAt"`
+	Name      string    `json:"name" url:"name"`
+	Edges     []*Edge   `json:"edges,omitempty" url:"edges,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -77407,12 +77407,12 @@ func (w *Workflow) GetModel() *WorkflowModel {
 	return w.Model
 }
 
-func (w *Workflow) GetId() string {
-	if w == nil {
-		return ""
-	}
-	return w.Id
-}
+// func (w *Workflow) GetId() string {
+// 	if w == nil {
+// 		return ""
+// 	}
+// 	return w.Id
+// }
 
 func (w *Workflow) GetOrgId() string {
 	if w == nil {
