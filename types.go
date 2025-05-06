@@ -77384,10 +77384,10 @@ type Workflow struct {
 	Model *WorkflowModel `json:"model,omitempty" url:"model,omitempty"`
 	// Id        string         `json:"id" url:"id"`
 	// OrgId     string    `json:"orgId" url:"orgId"`
-	CreatedAt time.Time `json:"createdAt" url:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt" url:"updatedAt"`
-	Name      string    `json:"name" url:"name"`
-	Edges     []*Edge   `json:"edges,omitempty" url:"edges,omitempty"`
+	// CreatedAt time.Time `json:"createdAt" url:"createdAt"`
+	// UpdatedAt time.Time `json:"updatedAt" url:"updatedAt"`
+	Name  string  `json:"name" url:"name"`
+	Edges []*Edge `json:"edges,omitempty" url:"edges,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -77421,19 +77421,19 @@ func (w *Workflow) GetModel() *WorkflowModel {
 // 	return w.OrgId
 // }
 
-func (w *Workflow) GetCreatedAt() time.Time {
-	if w == nil {
-		return time.Time{}
-	}
-	return w.CreatedAt
-}
+// func (w *Workflow) GetCreatedAt() time.Time {
+// 	if w == nil {
+// 		return time.Time{}
+// 	}
+// 	return w.CreatedAt
+// }
 
-func (w *Workflow) GetUpdatedAt() time.Time {
-	if w == nil {
-		return time.Time{}
-	}
-	return w.UpdatedAt
-}
+// func (w *Workflow) GetUpdatedAt() time.Time {
+// 	if w == nil {
+// 		return time.Time{}
+// 	}
+// 	return w.UpdatedAt
+// }
 
 func (w *Workflow) GetName() string {
 	if w == nil {
