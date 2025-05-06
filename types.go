@@ -77382,10 +77382,6 @@ type Workflow struct {
 	Nodes []*WorkflowNodesItem `json:"nodes,omitempty" url:"nodes,omitempty"`
 	// These are the options for the workflow's LLM.
 	Model *WorkflowModel `json:"model,omitempty" url:"model,omitempty"`
-	// Id        string         `json:"id" url:"id"`
-	// OrgId     string    `json:"orgId" url:"orgId"`
-	// CreatedAt time.Time `json:"createdAt" url:"createdAt"`
-	// UpdatedAt time.Time `json:"updatedAt" url:"updatedAt"`
 	Name  string  `json:"name" url:"name"`
 	Edges []*Edge `json:"edges,omitempty" url:"edges,omitempty"`
 
@@ -77406,34 +77402,6 @@ func (w *Workflow) GetModel() *WorkflowModel {
 	}
 	return w.Model
 }
-
-// func (w *Workflow) GetId() string {
-// 	if w == nil {
-// 		return ""
-// 	}
-// 	return w.Id
-// }
-
-// func (w *Workflow) GetOrgId() string {
-// 	if w == nil {
-// 		return ""
-// 	}
-// 	return w.OrgId
-// }
-
-// func (w *Workflow) GetCreatedAt() time.Time {
-// 	if w == nil {
-// 		return time.Time{}
-// 	}
-// 	return w.CreatedAt
-// }
-
-// func (w *Workflow) GetUpdatedAt() time.Time {
-// 	if w == nil {
-// 		return time.Time{}
-// 	}
-// 	return w.UpdatedAt
-// }
 
 func (w *Workflow) GetName() string {
 	if w == nil {
@@ -77466,8 +77434,6 @@ func (w *Workflow) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*w = Workflow(unmarshaler.embed)
-	w.CreatedAt = unmarshaler.CreatedAt.Time()
-	w.UpdatedAt = unmarshaler.UpdatedAt.Time()
 	extraProperties, err := internal.ExtractExtraProperties(data, *w)
 	if err != nil {
 		return err
@@ -77485,8 +77451,6 @@ func (w *Workflow) MarshalJSON() ([]byte, error) {
 		UpdatedAt *internal.DateTime `json:"updatedAt"`
 	}{
 		embed:     embed(*w),
-		CreatedAt: internal.NewDateTime(w.CreatedAt),
-		UpdatedAt: internal.NewDateTime(w.UpdatedAt),
 	}
 	return json.Marshal(marshaler)
 }
