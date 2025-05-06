@@ -77382,8 +77382,8 @@ type Workflow struct {
 	Nodes []*WorkflowNodesItem `json:"nodes,omitempty" url:"nodes,omitempty"`
 	// These are the options for the workflow's LLM.
 	Model *WorkflowModel `json:"model,omitempty" url:"model,omitempty"`
-	Name  string  `json:"name" url:"name"`
-	Edges []*Edge `json:"edges,omitempty" url:"edges,omitempty"`
+	Name  string         `json:"name" url:"name"`
+	Edges []*Edge        `json:"edges,omitempty" url:"edges,omitempty"`
 
 	extraProperties map[string]interface{}
 	rawJSON         json.RawMessage
@@ -77425,8 +77425,6 @@ func (w *Workflow) UnmarshalJSON(data []byte) error {
 	type embed Workflow
 	var unmarshaler = struct {
 		embed
-		CreatedAt *internal.DateTime `json:"createdAt"`
-		UpdatedAt *internal.DateTime `json:"updatedAt"`
 	}{
 		embed: embed(*w),
 	}
@@ -77447,10 +77445,8 @@ func (w *Workflow) MarshalJSON() ([]byte, error) {
 	type embed Workflow
 	var marshaler = struct {
 		embed
-		CreatedAt *internal.DateTime `json:"createdAt"`
-		UpdatedAt *internal.DateTime `json:"updatedAt"`
 	}{
-		embed:     embed(*w),
+		embed: embed(*w),
 	}
 	return json.Marshal(marshaler)
 }
