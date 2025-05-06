@@ -77383,7 +77383,7 @@ type Workflow struct {
 	// These are the options for the workflow's LLM.
 	Model *WorkflowModel `json:"model,omitempty" url:"model,omitempty"`
 	// Id        string         `json:"id" url:"id"`
-	OrgId     string    `json:"orgId" url:"orgId"`
+	// OrgId     string    `json:"orgId" url:"orgId"`
 	CreatedAt time.Time `json:"createdAt" url:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" url:"updatedAt"`
 	Name      string    `json:"name" url:"name"`
@@ -77414,12 +77414,12 @@ func (w *Workflow) GetModel() *WorkflowModel {
 // 	return w.Id
 // }
 
-func (w *Workflow) GetOrgId() string {
-	if w == nil {
-		return ""
-	}
-	return w.OrgId
-}
+// func (w *Workflow) GetOrgId() string {
+// 	if w == nil {
+// 		return ""
+// 	}
+// 	return w.OrgId
+// }
 
 func (w *Workflow) GetCreatedAt() time.Time {
 	if w == nil {
